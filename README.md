@@ -1,14 +1,20 @@
 clj-mudder
 ==========
 
-A [CES](http://en.wikipedia.org/wiki/Entity_component_system)-based MUD engine in Clojure.
+A [CES](http://en.wikipedia.org/wiki/Entity_component_system)-based [MUD](http://en.wikipedia.org/wiki/MUD) engine in Clojure.
 
 :construction: Heavily Under Construction :construction:
+
+Also I have no idea what I'm doing. ;)
 
 Running
 -------
 
-`lein start`
+With [Leiningen](http://leiningen.org/) installed (`brew install leiningen` on OS X with Homebrew), run:
+
+    lein start
+
+Currently you can only `look`.
 
 Documentation
 -------------
