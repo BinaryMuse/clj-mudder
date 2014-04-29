@@ -17,7 +17,11 @@
 (defn- look-at [world character target]
   (sys.comm/send-text world character (str "Sorry, you can't look at " target " yet.")))
 
-(defn look [world character target]
+(defn look
+  "The given character looks at the target. Target can be \"here\",
+  representing the character's current room, or a target, which will
+  be resolved based on the character's posessions and environment."
+  [world character target]
   (match [target]
     ["here"] (look-here world character)
     [at] (look-at world character at)))

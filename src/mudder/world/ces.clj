@@ -9,19 +9,37 @@
 (defn entity-id [ent]
   (first (keys ent)))
 
-(defn entity* [& components]
+(defn entity*
+  "Creates a new entity containing the given components.
+  Returns the entity ID."
+  [& components]
   (let [id (swap! current-entity-id inc)
         ent {id {:id id :components (into {} (map component-map components))}}]
     (swap! entities conj ent)
     id))
 
-(defmacro component* [name params & r]
+(defmacro component*
+  "Creates a new component by defining a method named `name`
+  that takes params `params`. `r` is a set of keys and values
+  that define the default data for the component; params can
+  be used.
+
+  Example:
+
+  (component* position [x y z]
+              :x x
+              :y y
+              :z z)"
+  [name params & r]
   `(defn ~name ~params
      (merge {::name ~(keyword name)} ~(apply hash-map r))))
 
 (defn with-component
+  "Returns the entity ID of all entities that contain the given component
+  and optionally matches the given guard clause. The clause is passed the
+  entity ID."
   ([world component]
-   (with-component world component identity))
+   (with-component world component (constantly true)))
   ([world component guard]
     (let [matching (filter #(contains? (set (keys (:components (%1 1)))) component) @world)
           guarded (filter guard matching)]
