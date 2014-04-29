@@ -39,7 +39,8 @@
 (component* container [entities]
             :entities (set entities))
 
-(component* player-character [])
+(component* player-character []
+            :output nil)
 
 (def player (entity* (describable "It's you!")
                      (container [])
@@ -50,39 +51,6 @@
 
 (def next-room (entity* (room [])
                         (describable "It's that other room.")))
-
-;(with-component @entities :room)
-
-;; (def world {1 {:components {:room {:entities #{3}}}}
-;;             2 {:components {:room {:entities #{}}}}})
-
-;; (defn room-contains-entity [room ent]
-;;   (contains? (get-in (last room) [:components :room :entities]) ent))
-
-;; ;; too much switching between maps and vectors with filter???
-;; (withc world :room #(room-contains-entity %1 3))
-
-;; (withc world :room)
-
-;; (component* room [entities]
-;;             :entities (set entities))
-
-;; (component* describable [description]
-;;             :description description)
-
-;; (component* container [entities]
-;;             :entities (set entities))
-
-;; (component* keyboard-controlled [])
-
-;; (def city-center (entity* (room [])
-;;                           (describable "The center of town. It's quite nice.")))
-
-;; (def player (entity* (describable "It's you!")
-;;                      (container [])
-;;                      (keyboard-controlled)))
-
-;; ; (swap! entities update-in [(entity-id city-center) :components :room :entities] conj (entity-id player))
 
 ;; (defn remove-from-room [world ent room]
 ;;   (let [id (first (keys room))]
@@ -99,14 +67,6 @@
 ;;           (remove-from-room ent source-room)
 ;;           (place-in-room ent destination))
 ;;       (place-in-room world ent destination))))
-
-;; ; need IDs only?? or should we just shove refs around...
-;; (swap! entities move-to-room (entity-id player) city-center)
-
-;; ; turn entities into refs and pass only ids around?
-
-;; (def world {1 {:components {:room {:entities #{3}}}}
-;;             2 {:components {:room {:entities #{}}}}})
 
 ;; (defn update-component [world entity path f & args]
 ;;   (update-in world (concat [entity :components] path) f args))
