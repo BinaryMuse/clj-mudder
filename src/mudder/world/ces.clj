@@ -1,21 +1,26 @@
 (ns mudder.world.ces)
 
 (def current-entity-id (atom 0))
-(def entities (atom (sorted-map)))
+(def entities (ref (sorted-map)))
+
+(defrecord entity [world id])
+
+(defn get-components [entity]
+  (get-in @(get entity :world) [(get entity :id) :components]))
 
 (defn- component-map [data]
-  (hash-map (keyword (::name data)) data))
+  (hash-map (keyword (::name data)) (ref data)))
 
 (defn entity-id [ent]
   (first (keys ent)))
 
 (defn entity*
-  "Creates a new entity containing the given components.
-  Returns the entity ID."
+  "Creates a new entity containing the given components. Must be called
+  from within a transaction. Returns the entity ID."
   [& components]
   (let [id (swap! current-entity-id inc)
         ent {id {:id id :components (into {} (map component-map components))}}]
-    (swap! entities conj ent)
+    (alter entities conj ent)
     id))
 
 (defmacro component*
@@ -60,15 +65,16 @@
 (component* player-character []
             :output nil)
 
-(def player (entity* (describable "It's you!")
-                     (container [])
-                     (player-character)))
+(dosync
+  (def player (entity* (describable "It's you!")
+                       (container [])
+                       (player-character)))
 
-(def city-center (entity* (room [player])
-                          (describable "The center of town. It's quite nice.")))
+  (def city-center (entity* (room [player])
+                            (describable "The center of town. It's quite nice.")))
 
-(def next-room (entity* (room [])
-                        (describable "It's that other room.")))
+  (def next-room (entity* (room [])
+                          (describable "It's that other room."))))
 
 ;; (defn remove-from-room [world ent room]
 ;;   (let [id (first (keys room))]
@@ -95,3 +101,33 @@
 ;;       (update-component to [:room :entities] conj ent)))
 
 ;; (move-entity world 3 1 2)
+
+
+
+
+
+;; (def w (ref {}))
+;; (dosync
+;;   (alter w assoc 1 {:components
+;;                     {:pos (ref {:x 1 :y 2 :z 3})
+;;                      :velocity (ref {:value 100})}}))
+
+;; (defprotocol HasComponents
+;;   (get-components [this]))
+
+;; (defrecord entity [world entid]
+;;   HasComponents
+;;   (get-components [this] (get-in @(get this :world) [(get this :entid) :components])))
+
+;; (def ship (->entity w 1))
+
+;; (get-components ship)
+
+;; (dosync
+;;  (let [components (get-components ship)
+;;        pos (get components :pos)
+;;        vel (get components :velocity)]
+;;    (alter pos assoc :y 10 :z 20)
+;;    (alter vel update-in [:value] inc)))
+
+;; @(:world ship)

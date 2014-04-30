@@ -14,20 +14,21 @@
         (let [string (<! outchan)]
           (println string)))))
 
-(defn- start-game-loop [world character input]
+(defn- start-game-loop [character input]
   (go (while true
         (let [string (<! input)
               command (parser/parse string)]
-          (sys.cmd/process-command world character command)))))
+          (sys.cmd/process-command character command)))))
 
 (defn -main []
   (let [input (chan)
         world (ces/build-world)
-        character (first (ces/with-component world :player-character))
+        charid (first (ces/with-component world :player-character))
+        character (ces/->entity world charid)
         outchan (chan)]
-    (sys.comm/install-output-channel world character outchan)
+    (sys.comm/install-output-channel character outchan)
     (send-output-to-console outchan)
-    (start-game-loop world character input)
+    (start-game-loop character input)
     (println "Ready...")
     (read-from-stdin input)))
 
