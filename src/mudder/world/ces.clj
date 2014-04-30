@@ -1,7 +1,7 @@
 (ns mudder.world.ces)
 
 (def current-entity-id (atom 0))
-(def entities (ref (sorted-map)))
+(def entities (atom (sorted-map)))
 
 (defrecord entity [world id])
 
@@ -15,12 +15,12 @@
   (first (keys ent)))
 
 (defn entity*
-  "Creates a new entity containing the given components. Must be called
-  from within a transaction. Returns the entity ID."
+  "Creates a new entity containing the given components.
+  Returns the entity ID."
   [& components]
   (let [id (swap! current-entity-id inc)
         ent {id {:id id :components (into {} (map component-map components))}}]
-    (alter entities conj ent)
+    (swap! entities conj ent)
     id))
 
 (defmacro component*
@@ -65,16 +65,15 @@
 (component* player-character []
             :output nil)
 
-(dosync
-  (def player (entity* (describable "It's you!")
-                       (container [])
-                       (player-character)))
+(def player (entity* (describable "It's you!")
+                     (container [])
+                     (player-character)))
 
-  (def city-center (entity* (room [player])
-                            (describable "The center of town. It's quite nice.")))
+(def city-center (entity* (room [player])
+                          (describable "The center of town. It's quite nice.")))
 
-  (def next-room (entity* (room [])
-                          (describable "It's that other room."))))
+(def next-room (entity* (room [])
+                        (describable "It's that other room.")))
 
 ;; (defn remove-from-room [world ent room]
 ;;   (let [id (first (keys room))]
