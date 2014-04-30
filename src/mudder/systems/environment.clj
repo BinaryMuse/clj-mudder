@@ -7,8 +7,7 @@
 (defn- look-here [character]
   (dosync
    (let [world (:world character)
-         rooms (filter (fn [ent]
-                         (some #{:room} (keys (:components ent)))) (vals @world))
+         rooms (filter #(contains? (:components %1) :room) (vals @world))
          char-room (first (filter (fn [ent]
                              (let [r (get-in ent [:components :room])]
                                (contains? (:entities @r) (:id character)))) rooms))
